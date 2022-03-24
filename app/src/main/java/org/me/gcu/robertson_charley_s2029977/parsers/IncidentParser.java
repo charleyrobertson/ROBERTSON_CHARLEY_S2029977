@@ -2,25 +2,24 @@ package org.me.gcu.robertson_charley_s2029977.parsers;
 
 import android.util.Log;
 
-import org.me.gcu.robertson_charley_s2029977.models.Roadworks;
+import org.me.gcu.robertson_charley_s2029977.models.Incidents;
+import org.me.gcu.robertson_charley_s2029977.models.PlannedRoadworks;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 
-public class RoadworkParser
+public class IncidentParser
 {
-    private Roadworks roadwork;
-    private List<Roadworks> roadworksList = new ArrayList<>();
 
-    public List<Roadworks> parseRoadworks(InputStream dataToParse) {
+    private Incidents incident;
+    private List<Incidents> incidentsList = new ArrayList<>();
+
+    public List<Incidents> parseIncidents(InputStream dataToParse) {
         try {
             XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
             factory.setNamespaceAware(true);
@@ -32,47 +31,46 @@ public class RoadworkParser
             while (eventType != XmlPullParser.END_DOCUMENT) {
                 if (eventType == XmlPullParser.START_TAG) {
                     if (parser.getName().equalsIgnoreCase("item")) {
-                        roadwork = new Roadworks();
+                        incident = new Incidents();
                         insideItemTag = true;
 
                     } else if (parser.getName().equalsIgnoreCase("title")) {
                         if (insideItemTag) {
-                            roadwork.setTitle(parser.nextText());
+                            incident.setTitle(parser.nextText());
                         }
 
                     } else if (parser.getName().equalsIgnoreCase("description")) {
                         if (insideItemTag) {
-                            roadwork.setDescription(parser.nextText());
+                            incident.setDescription(parser.nextText());
                         }
 
                     } else if (parser.getName().equalsIgnoreCase("link")) {
                         if (insideItemTag) {
-                            roadwork.setLink(parser.nextText());
+                            incident.setLink(parser.nextText());
                         }
 
                     } else if (parser.getName().equalsIgnoreCase("point")) {
                         if (insideItemTag) {
-                            roadwork.setLocation(parser.nextText());
+                            incident.setLocation(parser.nextText());
                         }
 
                     } else if (parser.getName().equalsIgnoreCase("pubDate")) {
                         if (insideItemTag) {
-                            roadwork.setPubDate(parser.nextText());
+                            incident.setPubDate(parser.nextText());
                         }
                     }
 
                 } else if (eventType == XmlPullParser.END_TAG && parser.getName().equalsIgnoreCase("item")) {
                     insideItemTag = false;
-                    roadworksList.add(roadwork);
+                    incidentsList.add(incident);
                 }
                 eventType = parser.next();
             }
-            //Log.e("Roadwork", ": " + roadwork.toString());
+            Log.e("Incidents", ": " + incident.toString());
         } catch (XmlPullParserException | IOException e) {
             e.printStackTrace();
         }
 
-        return roadworksList;
-    } //End of parseRoadworks
-
-    } //End of RoadworkParser
+        return incidentsList;
+    }//End of getincidents
+}//End of class

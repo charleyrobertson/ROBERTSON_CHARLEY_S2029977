@@ -12,8 +12,13 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import org.me.gcu.robertson_charley_s2029977.databinding.ActivityMainBinding;
+import org.me.gcu.robertson_charley_s2029977.models.Incidents;
+import org.me.gcu.robertson_charley_s2029977.models.PlannedRoadworks;
 import org.me.gcu.robertson_charley_s2029977.models.Roadworks;
+import org.me.gcu.robertson_charley_s2029977.parsers.IncidentParser;
+import org.me.gcu.robertson_charley_s2029977.parsers.PlannedRoadworkParser;
 import org.me.gcu.robertson_charley_s2029977.parsers.RoadworkParser;
+import org.me.gcu.robertson_charley_s2029977.ui.home.HomeViewModel;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -27,9 +32,23 @@ public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
 
+    //Roadworks
     private String roadworksURL = "https://trafficscotland.org/rss/feeds/roadworks.aspx";
     RoadworkParser roadworkParser = new RoadworkParser();
     private List<Roadworks> roadworkList = new ArrayList<>();
+
+    //Planned roadworks
+    private String plannedRoadworksURL = "https://trafficscotland.org/rss/feeds/plannedroadworks.aspx";
+    PlannedRoadworkParser pRoadworkParser = new PlannedRoadworkParser();
+    private List<PlannedRoadworks> pRoadworkList = new ArrayList<>();
+
+    //Incidents
+    private String incidentsURL = "https://trafficscotland.org/rss/feeds/incidents.aspx";
+    IncidentParser incidentsParser = new IncidentParser();
+    private List<Incidents> incidentsList = new ArrayList<>();
+
+    //test
+    HomeViewModel hmv = new HomeViewModel();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +70,8 @@ public class MainActivity extends AppCompatActivity {
         //Threading the calling of parser
         Log.e("Starting progress", "StartProgress()");
         startProgress();
+
+
 
     }
 
@@ -77,6 +98,7 @@ public class MainActivity extends AppCompatActivity {
                 in = new BufferedReader(new InputStreamReader(yc.getInputStream()));
 
                 roadworkList = roadworkParser.parseRoadworks(yc.getInputStream());
+                hmv.getRoadworks(roadworkList);
 
                 in.close();
 

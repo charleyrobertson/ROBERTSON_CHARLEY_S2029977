@@ -2,25 +2,21 @@ package org.me.gcu.robertson_charley_s2029977.parsers;
 
 import android.util.Log;
 
-import org.me.gcu.robertson_charley_s2029977.models.Roadworks;
+import org.me.gcu.robertson_charley_s2029977.models.PlannedRoadworks;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 
-public class RoadworkParser
-{
-    private Roadworks roadwork;
-    private List<Roadworks> roadworksList = new ArrayList<>();
+public class PlannedRoadworkParser {
+    private PlannedRoadworks plannedRoadwork;
+    private List<PlannedRoadworks> pRoadworksList = new ArrayList<>();
 
-    public List<Roadworks> parseRoadworks(InputStream dataToParse) {
+    public List<PlannedRoadworks> parsePlannedRoadworks(InputStream dataToParse) {
         try {
             XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
             factory.setNamespaceAware(true);
@@ -32,47 +28,46 @@ public class RoadworkParser
             while (eventType != XmlPullParser.END_DOCUMENT) {
                 if (eventType == XmlPullParser.START_TAG) {
                     if (parser.getName().equalsIgnoreCase("item")) {
-                        roadwork = new Roadworks();
+                        plannedRoadwork = new PlannedRoadworks();
                         insideItemTag = true;
 
                     } else if (parser.getName().equalsIgnoreCase("title")) {
                         if (insideItemTag) {
-                            roadwork.setTitle(parser.nextText());
+                            plannedRoadwork.setTitle(parser.nextText());
                         }
 
                     } else if (parser.getName().equalsIgnoreCase("description")) {
                         if (insideItemTag) {
-                            roadwork.setDescription(parser.nextText());
+                            plannedRoadwork.setDescription(parser.nextText());
                         }
 
                     } else if (parser.getName().equalsIgnoreCase("link")) {
                         if (insideItemTag) {
-                            roadwork.setLink(parser.nextText());
+                            plannedRoadwork.setLink(parser.nextText());
                         }
 
                     } else if (parser.getName().equalsIgnoreCase("point")) {
                         if (insideItemTag) {
-                            roadwork.setLocation(parser.nextText());
+                            plannedRoadwork.setLocation(parser.nextText());
                         }
 
                     } else if (parser.getName().equalsIgnoreCase("pubDate")) {
                         if (insideItemTag) {
-                            roadwork.setPubDate(parser.nextText());
+                            plannedRoadwork.setPubDate(parser.nextText());
                         }
                     }
 
                 } else if (eventType == XmlPullParser.END_TAG && parser.getName().equalsIgnoreCase("item")) {
                     insideItemTag = false;
-                    roadworksList.add(roadwork);
+                    pRoadworksList.add(plannedRoadwork);
                 }
                 eventType = parser.next();
             }
-            //Log.e("Roadwork", ": " + roadwork.toString());
+            //Log.e("Planned Roadwork", ": " + plannedRoadwork.toString());
         } catch (XmlPullParserException | IOException e) {
             e.printStackTrace();
         }
 
-        return roadworksList;
-    } //End of parseRoadworks
-
-    } //End of RoadworkParser
+        return pRoadworksList;
+    }//End of getplannedroadkworks
+}//End of class

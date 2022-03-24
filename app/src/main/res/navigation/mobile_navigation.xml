@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/navigation_home">
+
+    <fragment
+        android:id="@+id/navigation_home"
+        android:name="org.me.gcu.robertson_charley_s2029977.ui.home.HomeFragment"
+        android:label="@string/title_home"
+        tools:layout="@layout/home_fragment" />
+
+    <fragment
+        android:id="@+id/navigation_roadworks"
+        android:name="org.me.gcu.robertson_charley_s2029977.ui.roadworks.RoadworksFragment"
+        android:label="@string/title_roadworks"
+        tools:layout="@layout/roadworks_fragment" />
+
+    <fragment
+        android:id="@+id/navigation_search"
+        android:name="org.me.gcu.robertson_charley_s2029977.ui.search.SearchFragment"
+        android:label="@string/title_search"
+        tools:layout="@layout/search_fragment" />
+
+
+    <fragment
+        android:id="@+id/navigation_planner"
+        android:name="org.me.gcu.robertson_charley_s2029977.ui.planner.PlannerFragment"
+        android:label="@string/title_planner"
+        tools:layout="@layout/planner_fragment" />
+
+</navigation>

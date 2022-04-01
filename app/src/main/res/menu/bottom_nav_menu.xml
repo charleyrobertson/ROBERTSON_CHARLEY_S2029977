@@ -7,11 +7,6 @@
         android:title="@string/title_home" />
 
     <item
-        android:id="@+id/navigation_roadworks"
-        android:icon="@drawable/ic_baseline_edit_road_24"
-        android:title="@string/title_roadworks" />
-
-    <item
         android:id="@+id/navigation_search"
         android:icon="@drawable/ic_baseline_search_24"
         android:title="@string/title_search" />

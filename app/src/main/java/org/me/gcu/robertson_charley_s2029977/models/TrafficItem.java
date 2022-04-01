@@ -1,6 +1,6 @@
 package org.me.gcu.robertson_charley_s2029977.models;
 
-public class PlannedRoadworks
+public class TrafficItem
 {
     //Initialise Variables
     private String title;
@@ -10,12 +10,12 @@ public class PlannedRoadworks
     private String pubDate;
 
     //Constructors
-    public PlannedRoadworks()
+    public TrafficItem()
     {
 
     }
 
-    public PlannedRoadworks(String title, String description, String link, String location, String pubDate)
+    public TrafficItem(String title, String description, String link, String location, String pubDate)
     {
         this.title = title;
         this.description = description;
@@ -81,7 +81,7 @@ public class PlannedRoadworks
 
     @Override
     public String toString() {
-        return "PlannedRoadworks{" +
+        return "TrafficItem{" +
                 "title='" + title + '\'' +
                 ", description='" + description + '\'' +
                 ", link='" + link + '\'' +
@@ -89,4 +89,12 @@ public class PlannedRoadworks
                 ", pubDate='" + pubDate + '\'' +
                 '}';
     }
+
+
+}
+enum  TrafficListItem
+{
+    PlannedRoadworks,
+    Roadworks,
+    Incidents
 }

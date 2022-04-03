@@ -1,6 +1,4 @@
-package org.me.gcu.robertson_charley_s2029977.parsers;
-
-import android.util.Log;
+package org.me.gcu.robertson_charley_s2029977.helpers;
 
 import org.me.gcu.robertson_charley_s2029977.models.TrafficItem;
 import org.xmlpull.v1.XmlPullParser;
@@ -9,22 +7,16 @@ import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
+//Name: Charley Robertson - Student ID: S2029977
 public class ItemParser
 {
     private TrafficItem item;
     private List<TrafficItem> list = new ArrayList<>();
-    private String OLD_DATE_FORMAT = "EEE, dd MMM yyyy hh:mm:ss zzz";
-    private String NEW_DATE_FORMAT = "dd/MM/yyyy";
-    SimpleDateFormat formatDateOld =  new SimpleDateFormat(OLD_DATE_FORMAT, Locale.ENGLISH);
-    SimpleDateFormat formatDateNew =  new SimpleDateFormat(NEW_DATE_FORMAT, Locale.ENGLISH);
+    DateLogic dl = new DateLogic();
 
     public List<TrafficItem> parseItems(InputStream dataToParse) {
         try {
@@ -48,9 +40,22 @@ public class ItemParser
 
                     } else if (parser.getName().equalsIgnoreCase("description")) {
                         if (insideItemTag) {
-                            item.setDescription(parser.nextText().replaceAll("<br />", "\\\n"));
-                        }
+                            String desc = parser.nextText().replaceAll("<br />", "\\\n");
+                            item.setDescription(desc);
 
+                                if(desc.substring(0, 5).equalsIgnoreCase("start"))
+                                {
+                                    item.setStartDate(dl.parseStartDate(desc));
+                                    item.setEndDate(dl.parseEndDate(desc));
+                                    item.setDuration(dl.calculateDuration(dl.parseStartDate(desc), dl.parseEndDate(desc)));
+                                }
+                                else
+                                {
+                                    item.setStartDate(new Date());
+                                    item.setEndDate(new Date());
+                                    item.setDuration(1);
+                                }
+                            }
                     } else if (parser.getName().equalsIgnoreCase("link")) {
                         if (insideItemTag) {
                             item.setLink(parser.nextText());
@@ -63,13 +68,9 @@ public class ItemParser
 
                     } else if (parser.getName().equalsIgnoreCase("pubDate")) {
                         if (insideItemTag) {
-                            String temp = parser.nextText();
-                            Date dateTemp = formatDateOld.parse(temp);
+                            Date tempPubDate = dl.parseDate(parser.nextText());
 
-                            String temp2 = formatDateNew.format(dateTemp);
-                            dateTemp = formatDateNew.parse(temp2);
-
-                            item.setPubDate(dateTemp);
+                            item.setPubDate(tempPubDate);
                             //Log.i("Item Parser", "Pub Date: " + temp2 );
                         }
                     }
@@ -77,10 +78,11 @@ public class ItemParser
                 } else if (eventType == XmlPullParser.END_TAG && parser.getName().equalsIgnoreCase("item")) {
                     insideItemTag = false;
                     list.add(item);
+                    //Log.i("LOOK", "parseItems: " + item);
                 }
                 eventType = parser.next();
             }
-        } catch (XmlPullParserException | IOException | ParseException e) {
+        } catch (XmlPullParserException | IOException e) {
             e.printStackTrace();
         }
 

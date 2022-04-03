@@ -23,15 +23,15 @@ import org.me.gcu.robertson_charley_s2029977.R;
 import org.me.gcu.robertson_charley_s2029977.models.ListAdapter;
 import org.me.gcu.robertson_charley_s2029977.models.TrafficItem;
 import org.me.gcu.robertson_charley_s2029977.models.TrafficItemType;
-import org.me.gcu.robertson_charley_s2029977.parsers.ItemParser;
+import org.me.gcu.robertson_charley_s2029977.helpers.ItemParser;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -41,6 +41,8 @@ import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+
+//Name: Charley Robertson - Student ID: S2029977
 public class HomeFragment extends Fragment implements View.OnClickListener {
 
     //Initialising Traffic Item Lists/Traffic items
@@ -56,13 +58,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     private Button searchBtn;
     private Button clearBtn;
 
-    private String NEW_DATE_FORMAT = "dd/MM/yyyy";
-    SimpleDateFormat formatDateNew =  new SimpleDateFormat(NEW_DATE_FORMAT, Locale.ENGLISH);
+    SimpleDateFormat formatDateNew =  new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    {
         View view = inflater.inflate(R.layout.home_fragment, container, false);
         listView = view.findViewById(R.id.listview);
         datePicker = view.findViewById(R.id.datePicker);
@@ -86,7 +86,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         ExecutorService executerService = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
 
-
         Log.i("Home Frag", "startProgress: executing");
         String urls[] = {"https://trafficscotland.org/rss/feeds/roadworks.aspx", "https://trafficscotland.org/rss/feeds/plannedroadworks.aspx", "https://trafficscotland.org/rss/feeds/currentincidents.aspx"};
         executerService.execute(() -> {
@@ -96,48 +95,45 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 URLConnection yc;
                 BufferedReader in = null;
 
-                try {
+                try
+                {
                     aurl = new URL(url);
                     yc = aurl.openConnection();
                     in = new BufferedReader(new InputStreamReader(yc.getInputStream()));
 
-                    List<TrafficItem> temp = parser.parseItems(yc.getInputStream());
+                    List<TrafficItem> tempItem = parser.parseItems(yc.getInputStream());
 
                     if(url == "https://trafficscotland.org/rss/feeds/roadworks.aspx")
                     {
-                        for(TrafficItem item : temp)
+                        for(TrafficItem item : tempItem)
                         {
                             item.setType(TrafficItemType.Roadworks);
-                            trafficItemList.addAll(temp);
+                            trafficItemList.addAll(tempItem);
                         }
                     }
                     else if (url == "https://trafficscotland.org/rss/feeds/plannedroadworks.aspx")
                     {
-                        for(TrafficItem item : temp)
+                        for(TrafficItem item : tempItem)
                         {
                             item.setType(TrafficItemType.PlannedRoadworks);
-                            trafficItemList.addAll(temp);
+                            trafficItemList.addAll(tempItem);
                         }
                     }
                     else if (url == "https://trafficscotland.org/rss/feeds/currentincidents.aspx")
                     {
-                        for(TrafficItem item : temp)
+                        for(TrafficItem item : tempItem)
                         {
                             item.setType(TrafficItemType.Incidents);
-                            trafficItemList.addAll(temp);
+                            trafficItemList.addAll(tempItem);
                         }
                     }
-
-                    //trafficItemList.addAll(temp);
-                    temp.clear();
+                    tempItem.clear();
                     in.close();
-
-
-                } catch (IOException e)
+                }
+                catch (IOException e)
                 {
                     e.printStackTrace();
                 }
-
                 handler.post(() -> {
                     Log.i("Home Frag", "startProgress: in handler");
 
@@ -156,7 +152,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(@NonNull View view) {
-        //Switch statement
         switch (view.getId()) {
             //If the date picker is clicked
             case R.id.datePicker:
@@ -178,35 +173,39 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
             //If the search button is clicked
             case R.id.searchBtn:
-                if (datePicker.getText().toString().length() == 0) {
+                if (datePicker.getText().toString().length() == 0)
+                {
                     AlertDialog alertDialog = new AlertDialog.Builder(this.getContext()).create();
                     alertDialog.setTitle("Warning");
                     alertDialog.setMessage("Please select a date before attempting to search!");
                     alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                }
-                            });
+                            new DialogInterface.OnClickListener() {  public void onClick(DialogInterface dialog, int which) { dialog.dismiss(); } });
                     alertDialog.show();
-                } else {
-                    Date temp = new Date();
+                }
+                else
+                {
+                    Date tempDate = new Date();
                     try {
-                        temp = formatDateNew.parse(String.valueOf(datePicker.getText()));
+                        tempDate = formatDateNew.parse(String.valueOf(datePicker.getText()));
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
                     searchedTrafficList.clear();
 
                     for (TrafficItem item : trafficItemList) {
-                        //Log.e("Home Frag", "onClick: " + item.toString() );
-                        int equalDate = item.getPubDate().compareTo(temp);
+                        //Log.e("Home Frag", "onClick: " + item.toString());
+                        int equalToStartDate = item.getStartDate().compareTo(tempDate);
+                        int equaltoEndDate = item.getEndDate().compareTo(tempDate);
+                        boolean inbetweenDate = false;
 
-                        if (0 == equalDate) {
-                            //Log.i("Home Frag", "Adding items to list" + item);
+                        if(item.getStartDate().before(tempDate) && item.getEndDate().after(tempDate))
+                        {
+                            inbetweenDate = true;
+                        }
+
+                        if (0 == equalToStartDate || 0 == equaltoEndDate || inbetweenDate) {
+                           //Log.i("Home Frag", "Adding items to list" + item);
                             searchedTrafficList.add(item);
-                        } else {
-                            //Log.i("Home Frag", "Inside Else " + item);
                         }
                     }
 
@@ -216,11 +215,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                         alertDialog.setTitle("Information");
                         alertDialog.setMessage("Please select a different date. There are no scheduled roadworks or incidents on this day!");
                         alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.dismiss();
-                                    }
-                                });
+                                new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int which) { dialog.dismiss(); } });
                         alertDialog.show();
                     }
                     else
@@ -235,15 +230,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
             //If the clear button is clicked
             case R.id.clearBtn:
                 datePicker.getText().clear();
-
                 ListAdapter listAdapter = new ListAdapter(this.getContext(), trafficItemList);
                 listView.setAdapter(listAdapter);
-
             break;
             //If the clear button was clicked
-
         }
-
     }
 }
 

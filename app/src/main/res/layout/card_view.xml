@@ -27,7 +27,8 @@
                 android:layout_alignParentTop="true"
                 android:layout_toRightOf="@+id/cardview_image"
                 android:paddingBottom="5dp"
-                android:textSize="24sp" />
+                android:textSize="24sp"
+                android:textColor="#000000"/>
 
             <TextView
                 android:id="@+id/short_description1"
@@ -35,19 +36,28 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/cardview_title"
                 android:layout_toRightOf="@+id/cardview_image"
-                android:textColor="#8b8b8b" />
+                android:textColor="#000000" />
+
+            <TextView
+                android:id="@+id/duration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/short_description1"
+                android:layout_toRightOf="@+id/cardview_image"
+                android:textColor="#000000" />
 
             <TextView
                 android:id="@+id/link"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/short_description1"
+                android:layout_below="@+id/duration"
                 android:layout_toRightOf="@+id/cardview_image"
-                android:text="See More"
-                android:textSize="20sp"
+                android:text="See More..."
+                android:textSize="15dp"
                 android:textColor="#8b8b8b"
                 android:onClick="onClick"
-                android:clickable="true"/>
+                android:clickable="true"
+                />
 
             <ImageView
                 android:id="@+id/cardview_image"
@@ -58,12 +68,6 @@
                 android:layout_marginRight="18dp"
                 android:src="@mipmap/ic_launcher" />
 
-            <TextView
-                android:id="@+id/image_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/cardview_image"
-                android:layout_marginTop="6dp" />
 
         </RelativeLayout>
 

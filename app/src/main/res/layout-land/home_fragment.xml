@@ -9,8 +9,8 @@
 
     <EditText
         android:id="@+id/datePicker"
-        android:layout_width="265dp"
-        android:layout_height="53dp"
+        android:layout_width="470dp"
+        android:layout_height="50dp"
 
         android:hint="Enter a date"
         tools:ignore="MissingConstraints"
@@ -19,10 +19,10 @@
 
     <Button
         android:id="@+id/searchBtn"
-        android:layout_width="136dp"
-        android:layout_height="54dp"
-        android:layout_marginStart="4dp"
-        android:layout_marginBottom="40dp"
+        android:layout_width="223dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginBottom="44dp"
         android:text="Search Dates"
         app:layout_constraintBottom_toTopOf="@+id/listview"
         app:layout_constraintStart_toEndOf="@+id/datePicker"
@@ -30,8 +30,8 @@
 
     <Button
         android:id="@+id/clearBtn"
-        android:layout_width="409dp"
-        android:layout_height="43dp"
+        android:layout_width="709dp"
+        android:layout_height="53dp"
         android:text="Clear Searches"
         app:layout_constraintBottom_toTopOf="@+id/listview"
         app:layout_constraintTop_toBottomOf="@+id/datePicker"

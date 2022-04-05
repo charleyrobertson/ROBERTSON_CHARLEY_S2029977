@@ -6,4 +6,5 @@
     <string name="title_roadworks">Roadworks</string>
     <string name="title_search">Search</string>
     <string name="title_planner">Planner</string>
+    <string name="title_activity_maps">MapsActivity</string>
 </resources>

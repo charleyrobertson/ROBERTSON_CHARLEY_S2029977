@@ -1,5 +1,7 @@
 package org.me.gcu.robertson_charley_s2029977.helpers;
 
+import android.util.Log;
+
 import org.me.gcu.robertson_charley_s2029977.models.TrafficItem;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -63,7 +65,14 @@ public class ItemParser
 
                     } else if (parser.getName().equalsIgnoreCase("point")) {
                         if (insideItemTag) {
-                            item.setLocation(parser.nextText());
+                            String location = parser.nextText();
+
+                            int space = location.indexOf(" ");
+                            String lat = location.substring(0, space);
+                            String lon = location.substring(space + 1);
+
+                            item.setLat(Double.parseDouble(lat));
+                            item.setLon(Double.parseDouble(lon));
                         }
 
                     } else if (parser.getName().equalsIgnoreCase("pubDate")) {

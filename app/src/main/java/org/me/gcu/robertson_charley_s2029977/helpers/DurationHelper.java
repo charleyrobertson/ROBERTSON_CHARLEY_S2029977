@@ -68,7 +68,6 @@ public class DurationHelper
             {
                 finalDuration = weeks + " " + findDaysWeeks(duration);
             }
-
         }
         else
         {
@@ -76,9 +75,6 @@ public class DurationHelper
 
             finalDuration = days + " " + findDaysWeeks(days);
         }
-
-
-
         return finalDuration;
     }
 

@@ -9,17 +9,17 @@
 
     <EditText
         android:id="@+id/dateChooser"
-        android:layout_width="265dp"
-        android:layout_height="53dp"
+        android:layout_width="579dp"
+        android:layout_height="50dp"
         android:hint="Enter a date..."
         tools:ignore="MissingConstraints"
         tools:layout_editor_absoluteX="5dp"
-        tools:layout_editor_absoluteY="16dp" />
+        tools:layout_editor_absoluteY="19dp" />
 
     <EditText
         android:id="@+id/searchBar"
-        android:layout_width="265dp"
-        android:layout_height="53dp"
+        android:layout_width="584dp"
+        android:layout_height="54dp"
         android:layout_marginTop="4dp"
         android:hint="Enter a road..."
         app:layout_constraintTop_toBottomOf="@+id/dateChooser"
@@ -48,11 +48,11 @@
 
     <com.google.android.gms.maps.MapView
         android:id="@+id/map"
-        android:layout_width="414dp"
-        android:layout_height="591dp"
+        android:layout_width="733dp"
+        android:layout_height="615dp"
         android:layout_marginTop="20dp"
         app:layout_constraintTop_toBottomOf="@+id/clearBtn"
-        tools:layout_editor_absoluteX="-2dp"
-        tools:ignore="MissingConstraints" />
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="-2dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

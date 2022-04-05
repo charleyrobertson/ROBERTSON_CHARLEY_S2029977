@@ -1,8 +1,12 @@
 package org.me.gcu.robertson_charley_s2029977.ui.home;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -64,11 +68,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         View view = inflater.inflate(R.layout.home_fragment, container, false);
+
         listView = view.findViewById(R.id.listview);
         datePicker = view.findViewById(R.id.datePicker);
-
-        Log.i("Home Frag", "Starting Progress");
-        startProgress();
 
         datePicker.setInputType(InputType.TYPE_NULL);
         datePicker.setOnClickListener(v -> { onClick(v); });
@@ -77,9 +79,42 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         searchBtn.setOnClickListener(viewB ->  { onClick(viewB); });
 
         clearBtn = view.findViewById(R.id.clearBtn);
-        clearBtn.setOnClickListener(viewC -> {onClick(viewC); });
+        clearBtn.setOnClickListener(viewC -> { onClick(viewC); });
+
+        if (isOnline()) {
+            Log.i("Search Frag", "Starting Progress");
+            startProgress();
+
+        } else {
+            try {
+                AlertDialog alertDialog = new AlertDialog.Builder(this.getContext()).create();
+                alertDialog.setTitle("Warning");
+                alertDialog.setMessage("Please ensure you are connected to the internet!");
+                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                alertDialog.show();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 
         return view;
+    }
+
+
+    public boolean isOnline () {
+        ConnectivityManager conMgr = (ConnectivityManager) this.getContext()
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        @SuppressLint("MissingPermission") NetworkInfo netInfo = conMgr.getActiveNetworkInfo();
+
+        if (netInfo == null || !netInfo.isConnected() || !netInfo.isAvailable()) {
+            return false;
+        }
+        return true;
     }
 
     public void startProgress() {

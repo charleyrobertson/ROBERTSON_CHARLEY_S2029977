@@ -1,7 +1,11 @@
 package org.me.gcu.robertson_charley_s2029977.ui.search;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -54,135 +58,158 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
         searchBar = view.findViewById(R.id.search_bar);
 
         searchBtn = view.findViewById(R.id.searchBtn);
-        searchBtn.setOnClickListener(viewS -> { onClick(viewS); });
+        searchBtn.setOnClickListener(viewS -> {
+            onClick(viewS);
+        });
 
         clearBtn = view.findViewById(R.id.clearBtn);
-        clearBtn.setOnClickListener(viewC -> { onClick(viewC); });
+        clearBtn.setOnClickListener(viewC -> {
+            onClick(viewC);
+        });
 
-        Log.i("Search Frag", "Starting Progress");
-        startProgress();
+        if (isOnline()) {
+            Log.i("Search Frag", "Starting Progress");
+            startProgress();
 
-        return view;
+        } else {
+            try {
+                AlertDialog alertDialog = new AlertDialog.Builder(this.getContext()).create();
+                alertDialog.setTitle("Warning");
+                alertDialog.setMessage("Please ensure you are connected to the internet!");
+                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                alertDialog.show();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+            return view;
+        }
+
+
+
+    public boolean isOnline () {
+        ConnectivityManager conMgr = (ConnectivityManager) this.getContext()
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        @SuppressLint("MissingPermission") NetworkInfo netInfo = conMgr.getActiveNetworkInfo();
+
+        if (netInfo == null || !netInfo.isConnected() || !netInfo.isAvailable()) {
+            return false;
+        }
+        return true;
     }
 
-    public void startProgress() {
-        ExecutorService executerService = Executors.newSingleThreadExecutor();
-        Handler handler = new Handler(Looper.getMainLooper());
+        public void startProgress()
+    {
+            ExecutorService executerService = Executors.newSingleThreadExecutor();
+            Handler handler = new Handler(Looper.getMainLooper());
 
-        Log.i("Search Frag", "startProgress: executing");
-        String urls[] = {"https://trafficscotland.org/rss/feeds/roadworks.aspx", "https://trafficscotland.org/rss/feeds/plannedroadworks.aspx", "https://trafficscotland.org/rss/feeds/currentincidents.aspx"};
-        executerService.execute(() -> {
-            for (String url : urls)
-            {
-                URL aurl;
-                URLConnection yc;
-                BufferedReader in = null;
+            Log.i("Search Frag", "startProgress: executing");
+            String urls[] = {"https://trafficscotland.org/rss/feeds/roadworks.aspx", "https://trafficscotland.org/rss/feeds/plannedroadworks.aspx", "https://trafficscotland.org/rss/feeds/currentincidents.aspx"};
+            executerService.execute(() -> {
+                for (String url : urls) {
+                    URL aurl;
+                    URLConnection yc;
+                    BufferedReader in = null;
 
-                try
-                {
-                    aurl = new URL(url);
-                    yc = aurl.openConnection();
-                    in = new BufferedReader(new InputStreamReader(yc.getInputStream()));
+                    try {
+                        aurl = new URL(url);
+                        yc = aurl.openConnection();
+                        in = new BufferedReader(new InputStreamReader(yc.getInputStream()));
 
-                    List<TrafficItem> tempItem = parser.parseItems(yc.getInputStream());
+                        List<TrafficItem> tempItem = parser.parseItems(yc.getInputStream());
 
-                    if(url == "https://trafficscotland.org/rss/feeds/roadworks.aspx")
-                    {
-                        for(TrafficItem item : tempItem)
-                        {
-                            item.setType(TrafficItemType.Roadworks);
-                            trafficItemList.addAll(tempItem);
+                        if (url == "https://trafficscotland.org/rss/feeds/roadworks.aspx") {
+                            for (TrafficItem item : tempItem) {
+                                item.setType(TrafficItemType.Roadworks);
+                                trafficItemList.addAll(tempItem);
+                            }
+                        } else if (url == "https://trafficscotland.org/rss/feeds/plannedroadworks.aspx") {
+                            for (TrafficItem item : tempItem) {
+                                item.setType(TrafficItemType.PlannedRoadworks);
+                                trafficItemList.addAll(tempItem);
+                            }
+                        } else if (url == "https://trafficscotland.org/rss/feeds/currentincidents.aspx") {
+                            for (TrafficItem item : tempItem) {
+                                item.setType(TrafficItemType.Incidents);
+                                trafficItemList.addAll(tempItem);
+                            }
                         }
+                        tempItem.clear();
+                        in.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
-                    else if (url == "https://trafficscotland.org/rss/feeds/plannedroadworks.aspx")
-                    {
-                        for(TrafficItem item : tempItem)
-                        {
-                            item.setType(TrafficItemType.PlannedRoadworks);
-                            trafficItemList.addAll(tempItem);
-                        }
-                    }
-                    else if (url == "https://trafficscotland.org/rss/feeds/currentincidents.aspx")
-                    {
-                        for(TrafficItem item : tempItem)
-                        {
-                            item.setType(TrafficItemType.Incidents);
-                            trafficItemList.addAll(tempItem);
-                        }
-                    }
-                    tempItem.clear();
-                    in.close();
+                    handler.post(() -> {
+                        Log.i("Search Frag", "startProgress: in handler");
+
+                        Collections.shuffle(trafficItemList);
+                        ListAdapter listAdapter = new ListAdapter(this.getContext(), trafficItemList);
+                        listView.setAdapter(listAdapter);
+                    });
                 }
-                catch (IOException e)
-                {
-                    e.printStackTrace();
-                }
-                handler.post(() -> {
-                    Log.i("Search Frag", "startProgress: in handler");
+            });
+        }
 
-                    Collections.shuffle(trafficItemList);
+        @Override
+        public void onClick (View view)
+        {
+            switch (view.getId()) {
+                //Start of searchBtm
+                case R.id.searchBtn:
+                    if (searchBar.getText().toString().length() == 0) {
+                        AlertDialog alertDialog = new AlertDialog.Builder(this.getContext()).create();
+                        alertDialog.setTitle("Warning");
+                        alertDialog.setMessage("Please enter a road before attempting to search!");
+                        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                });
+                        alertDialog.show();
+                    } else {
+                        String searchTerm = searchBar.getText().toString();
+                        searchedTrafficList.clear();
+
+                        for (TrafficItem item : trafficItemList) {
+                            if (item.getTitle().contains(searchTerm)) {
+                                searchedTrafficList.add(item);
+                            }
+                        }
+                    }
+
+                    if (searchedTrafficList.isEmpty()) {
+                        AlertDialog alertDialog = new AlertDialog.Builder(this.getContext()).create();
+                        alertDialog.setTitle("Information");
+                        alertDialog.setMessage("Please search for a different road. There are no scheduled roadworks or incidents on this road!");
+                        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                });
+                        alertDialog.show();
+                    } else {
+                        ListAdapter listAdapter = new ListAdapter(this.getContext(), searchedTrafficList);
+                        listView.setAdapter(listAdapter);
+                    }
+
+                    break;
+                //End of searchBtm
+
+                //Start of clearBtm
+                case R.id.clearBtn:
+                    searchBar.getText().clear();
                     ListAdapter listAdapter = new ListAdapter(this.getContext(), trafficItemList);
                     listView.setAdapter(listAdapter);
-                });
+                    break;
+                //End of clearBtn
             }
-        });
-    }
-
-    @Override
-    public void onClick(View view)
-    {
-        switch (view.getId())
-        {
-            //Start of searchBtm
-            case R.id.searchBtn:
-                if (searchBar.getText().toString().length() == 0)
-                {
-                    AlertDialog alertDialog = new AlertDialog.Builder(this.getContext()).create();
-                    alertDialog.setTitle("Warning");
-                    alertDialog.setMessage("Please enter a road before attempting to search!");
-                    alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                            new DialogInterface.OnClickListener() {  public void onClick(DialogInterface dialog, int which) { dialog.dismiss(); } });
-                    alertDialog.show();
-                }
-                else
-                {
-                    String searchTerm = searchBar.getText().toString();
-                    searchedTrafficList.clear();
-
-                    for(TrafficItem item : trafficItemList)
-                    {
-                        if(item.getTitle().contains(searchTerm))
-                        {
-                            searchedTrafficList.add(item);
-                        }
-                    }
-                }
-
-                if(searchedTrafficList.isEmpty())
-                {
-                    AlertDialog alertDialog = new AlertDialog.Builder(this.getContext()).create();
-                    alertDialog.setTitle("Information");
-                    alertDialog.setMessage("Please search for a different road. There are no scheduled roadworks or incidents on this road!");
-                    alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                            new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int which) { dialog.dismiss(); } });
-                    alertDialog.show();
-                }
-                else
-                {
-                    ListAdapter listAdapter = new ListAdapter(this.getContext(), searchedTrafficList);
-                    listView.setAdapter(listAdapter);
-                }
-
-            break;
-            //End of searchBtm
-
-            //Start of clearBtm
-            case R.id.clearBtn:
-                searchBar.getText().clear();
-                ListAdapter listAdapter = new ListAdapter(this.getContext(), trafficItemList);
-                listView.setAdapter(listAdapter);
-            break;
-            //End of clearBtn
         }
     }
-}
